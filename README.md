@@ -59,7 +59,7 @@ Rotorflight Dashboard V2.1 是一款专为ELRS遥控器设计的 Lua 脚本，�
 ## 安装和配置
 
 ### 前置要求
-1. Radiomaster 遥控器（支持 EdgeTX 或 OpenTX 系统）
+1. 遥控器（支持 EdgeTX 或 OpenTX 系统）
 2. Rotorflight 2.1 及以上固件
 3. ELRS 接收机（需启用自定义遥测功能）
 4. 支持的遥测传感器：
@@ -451,5 +451,6 @@ Rotorflight Dashboard V2.1 是一款专为ELRS遥控器设计的 Lua 脚本，�
 ---
 
 **祝您飞行愉快！**
+
 
 
