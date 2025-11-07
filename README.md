@@ -2,7 +2,7 @@
 # 基于RF2的遥测显示与飞行日志系统
 
 **版本 / Version:** 2.1  
-**作者 / Author:** RFDB  
+**作者 / Author:** 212049  
 **平台 / Platform:** EdgeTX / OpenTX (128x64 LCD 屏幕)
 
 ---
@@ -465,3 +465,4 @@ local teleItemName = {
 ---
 
 *说明书版本：2.1 | 最后更新：2025-01*
+
