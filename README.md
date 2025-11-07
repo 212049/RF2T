@@ -1,3 +1,507 @@
+# RF2 Telemetry Display and Flight Log System
+## Instruction Manual
+
+### Version 2.1
+### For OpenTX/EdgeTX Transmitters
+
+---
+
+## Table of Contents
+
+1. [Introduction](#introduction)
+2. [System Requirements](#system-requirements)
+3. [Installation](#installation)
+4. [Features Overview](#features-overview)
+5. [Main Display Page](#main-display-page)
+6. [Flight Logging](#flight-logging)
+7. [Viewing Flight Logs](#viewing-flight-logs)
+8. [Navigation and Controls](#navigation-and-controls)
+9. [File Structure](#file-structure)
+10. [Troubleshooting](#troubleshooting)
+11. [Technical Specifications](#technical-specifications)
+
+---
+
+## Introduction
+
+The RF2 Telemetry Display and Flight Log System is a comprehensive Lua script for OpenTX/EdgeTX radio transmitters that provides real-time telemetry monitoring and automatic flight logging for RC helicopters and aircraft. The system tracks flight data, displays telemetry information, and maintains detailed flight history logs.
+
+### Key Capabilities
+
+- **Real-time Telemetry Display**: Monitor battery voltage, current, RPM, temperature, and more
+- **Automatic Flight Logging**: Automatically records flight data when connection is established
+- **Flight History Browser**: Review past flights by date with detailed statistics
+- **Flight Statistics**: Track total flight count per model
+- **Flight Timer**: Automatic timer with audio alerts
+- **Post-Flight Summary**: View flight statistics after disconnection
+
+---
+
+## System Requirements
+
+### Hardware
+- OpenTX or EdgeTX compatible transmitter
+- Telemetry-enabled receiver
+- Compatible sensors for the following telemetry values:
+  - Battery voltage (Vbat)
+  - Current (Curr)
+  - Head speed/RPM (Hspd)
+  - Capacity (Capa)
+  - Battery percentage (Bat%)
+  - ESC temperature (Tesc)
+  - Throttle (Thr)
+  - RSSI (1RSS)
+  - BEC voltage (Vbec)
+  - Governor state (GOV)
+
+### Software
+- OpenTX 2.3.x or later, OR EdgeTX 2.5.x or later
+- Lua script support enabled
+
+---
+
+## Installation
+
+1. **Copy the Script**
+   - Copy `rf2t.lua` to your transmitter's `/SCRIPTS/TELEMETRY/` directory
+   - Ensure the file is named exactly `rf2t.lua`
+
+2. **Create Log Directory**
+   - The script will automatically create the `/LOGS/` directory structure
+   - Logs are organized by model name: `/LOGS/[ModelName]/`
+
+3. **Enable the Script**
+   - On your transmitter, navigate to the Telemetry page
+   - Select "Scripts" and choose `rf2t`
+   - The script will initialize automatically
+
+4. **Initial Setup**
+   - On first run, the system will scan existing log files (up to 365 days)
+   - This may take a few minutes depending on the number of logs
+   - Progress is displayed on the date selection screen
+
+---
+
+## Features Overview
+
+### Main Features
+
+1. **Telemetry Display (Page 0)**
+   - Real-time monitoring of all telemetry values
+   - Flight timer
+   - Connection status indicator
+   - Governor state display
+
+2. **Flight Logging**
+   - Automatic logging when telemetry connection is established
+   - Minimum flight time: 30 seconds
+   - Logs saved to CSV format
+
+3. **Flight History (Page 1)**
+   - Browse flights by date
+   - View flight list with model name and duration
+   - Quick statistics display
+
+4. **Date Selection (Page 2)**
+   - Browse months and dates with available logs
+   - Automatic scanning of log files
+
+5. **Flight Detail View (Page 3)**
+   - Detailed information for each flight
+   - Complete flight statistics
+
+---
+
+## Main Display Page
+
+The main display (Page 0) shows real-time telemetry data when connected to your model.
+
+### Display Layout
+
+**Top Bar:**
+- **Left**: Model name
+- **Center**: Governor state (or "RX LOSS" if disconnected)
+- **Right**: Transmitter battery voltage
+
+**Left Panel:**
+- **Battery Percentage Bar**: Visual indicator (0-100%)
+- **Battery Voltage**: Main battery voltage (V)
+- **Capacity**: Current capacity used (mAh)
+- **Current**: Current draw / Maximum current (A)
+
+**Center Panel:**
+- **RPM**: Large display of head speed/RPM
+- **Throttle**: Throttle percentage (%)
+- **ESC Temperature**: ESC temperature (°C)
+
+**Right Panel:**
+- **Flight Time**: MM:SS format timer
+- **BEC Voltage**: BEC output voltage (V)
+- **RSSI**: Signal strength (dB)
+
+### Flight Timer
+
+- **Start Condition**: Timer starts when:
+  - Telemetry connection is established (RSSI > 0)
+  - Model is armed (Channel 5 > 0)
+- **Pause Condition**: Timer pauses when:
+  - Model is disarmed
+  - Telemetry connection is lost
+- **Audio Alerts**: Announces flight time at each minute interval
+
+### Connection Status
+
+- **Connected**: Green indicator, governor state displayed
+- **Disconnected**: "RX LOSS" blinking indicator
+- **Auto-switch**: Automatically returns to main page when connection is restored
+
+---
+
+## Flight Logging
+
+### Automatic Logging
+
+The system automatically logs flight data when:
+
+1. Telemetry connection is established
+2. Model is armed (Channel 5 > 0)
+3. Flight duration exceeds 30 seconds
+4. Connection is lost (disarm or signal loss)
+
+### Logged Data
+
+Each flight log entry contains:
+
+1. **Date**: YYYYMMDD format
+2. **Model Name**: Current model name
+3. **Flight Time**: Duration in MM:SS format
+4. **Flight Number**: Sequential number for the day
+5. **Capacity**: Battery capacity used (mAh)
+6. **Minimum Voltage**: Lowest battery voltage during flight (V)
+7. **Maximum Current**: Peak current draw (A)
+8. **Maximum Power**: Peak power consumption (W)
+9. **Maximum RPM**: Peak head speed (RPM)
+10. **Minimum BEC Voltage**: Lowest BEC voltage (V)
+11. **Total Flights**: Cumulative flight count for the model
+
+### Log File Format
+
+- **Location**: `/LOGS/[ModelName]/RFLog_YYYYMMDD.csv`
+- **Format**: Pipe-delimited CSV (|)
+- **Example**: `20250115|MyHeli|05:23|3|1250|3.6|45|162|2800|5.0|127`
+
+### Post-Flight Summary
+
+After disconnection, a summary board displays:
+
+- **Flight Time**: Total duration
+- **Date**: Flight date
+- **Flight Number**: Today's flight number
+- **Battery Capacity**: Used capacity (mAh)
+- **Maximum Current**: Peak current (A)
+- **Maximum RPM**: Peak head speed
+- **Minimum Voltage**: Lowest battery voltage
+- **Maximum Power**: Peak power (W)
+- **Minimum BEC Voltage**: Lowest BEC voltage
+- **Total Flights**: Model's total flight count
+
+**To close the summary**: Press the exit/back button
+
+---
+
+## Viewing Flight Logs
+
+### Accessing Flight Logs
+
+1. **From Main Page**: Press MENU button
+2. **From Log List**: Press EXIT to return to main page
+
+### Log List Page (Page 1)
+
+**Display:**
+- **Top Bar**: Selected date and total flight count
+- **Left Panel**: List of flights with:
+  - Flight number
+  - Model name
+  - Flight duration
+- **Right Panel**: Quick statistics for selected flight:
+  - Minimum voltage
+  - Capacity used
+  - Maximum current
+  - Maximum RPM
+
+**Navigation:**
+- **Rotary Encoder Left/Right**: Navigate through flights
+- **ENTER**: View detailed flight information
+- **MENU**: Open date selection
+- **EXIT**: Return to main page or date selection
+
+### Date Selection Page (Page 2)
+
+**Two-Level Selection:**
+
+1. **Month Selection** (Default):
+   - Left panel shows available months (YYYY-MM format)
+   - Right panel shows "Select Month" prompt
+   - Navigate with rotary encoder
+   - Press ENTER to select month
+
+2. **Date Selection**:
+   - Left panel shows selected month
+   - Right panel shows available dates (DD format)
+   - Navigate with rotary encoder
+   - Press ENTER to view flights for selected date
+   - Press EXIT to return to month selection
+
+**Scanning:**
+- On first access, the system scans for log files (up to 365 days)
+- Progress bar shows scanning status
+- Scanning occurs in background and doesn't block operation
+- Maximum 24 months displayed
+
+### Flight Detail Page (Page 3)
+
+**Left Panel:**
+- Model name
+- Flight time
+- Today's flight number
+- Total flights (cumulative)
+
+**Right Panel:**
+- Maximum power (W)
+- Maximum RPM
+- Minimum BEC voltage (V)
+- Minimum battery voltage (V)
+- Maximum current (A)
+- Battery capacity used (mAh)
+
+**Navigation:**
+- **ENTER or EXIT**: Return to log list
+
+---
+
+## Navigation and Controls
+
+### Button Functions
+
+| Button | Main Page | Log List | Date Select | Detail View |
+|--------|-----------|----------|-------------|-------------|
+| **MENU** | Open log list | Open date selection | - | - |
+| **ENTER** | - | View flight detail | Select month/date | Return to list |
+| **EXIT** | Close summary (if shown) | Return to main/date select | Return to log list/month select | Return to list |
+| **Rotary Left** | - | Previous flight | Previous month/date | - |
+| **Rotary Right** | - | Next flight | Next month/date | - |
+
+### Page Flow
+
+```
+Main Page (0)
+    ↓ MENU
+Log List (1) ←→ Date Select (2)
+    ↓ ENTER          ↓ ENTER
+Detail View (3)     Log List (1)
+```
+
+---
+
+## File Structure
+
+### Directory Structure
+
+```
+/LOGS/
+├── RFStats.csv                    # Flight statistics (model name | total flights)
+└── [ModelName]/                   # Per-model log directory
+    ├── RFLog_20250101.csv         # Daily log files
+    ├── RFLog_20250102.csv
+    └── ...
+```
+
+### Log File Format
+
+**RFLog_YYYYMMDD.csv:**
+```
+Date|Model|Time|#|Capa|MinV|MaxI|MaxP|MaxRPM|MinBEC|Total
+20250115|MyHeli|05:23|1|1250|3.6|45|162|2800|5.0|127
+20250115|MyHeli|04:15|2|1180|3.7|42|151|2750|5.1|128
+```
+
+**RFStats.csv:**
+```
+ModelName1|150
+ModelName2|75
+MyHeli|128
+```
+
+### Legacy Support
+
+The system supports both:
+- **New format**: `/LOGS/[ModelName]/RFLog_YYYYMMDD.csv`
+- **Old format**: `/LOGS/RFLog_YYYYMMDD.csv` (for backward compatibility)
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**1. Script Not Loading**
+- Verify file is in `/SCRIPTS/TELEMETRY/` directory
+- Check file name is exactly `rf2t.lua`
+- Ensure Lua is enabled in transmitter settings
+- Check transmitter firmware version compatibility
+
+**2. No Telemetry Data Displayed**
+- Verify telemetry sensors are properly configured
+- Check sensor names match expected values:
+  - Vbat, Curr, Hspd, Capa, Bat%, Tesc, Thr, 1RSS, Vbec, GOV
+- Ensure telemetry is enabled in model settings
+- Check receiver telemetry is active
+
+**3. Flights Not Logging**
+- Verify minimum flight time (30 seconds) is met
+- Check model is armed (Channel 5 > 0)
+- Ensure telemetry connection is established
+- Verify SD card has sufficient space
+- Check `/LOGS/` directory is writable
+
+**4. Logs Not Appearing**
+- Wait for initial scan to complete (up to 365 days)
+- Check log files exist in `/LOGS/` directory
+- Verify date format is correct (YYYYMMDD)
+- Try accessing date selection to trigger rescan
+
+**5. Timer Not Starting**
+- Ensure telemetry connection is active (RSSI > 0)
+- Verify model is armed (Channel 5 > 0)
+- Check governor state is not "LOST-HS"
+
+**6. Statistics Not Updating**
+- Statistics file (`RFStats.csv`) is created/updated automatically
+- First-time scan may take several minutes
+- Statistics update after each logged flight
+- Manual rescan: Delete `RFStats.csv` and restart script
+
+**7. Display Issues**
+- Clear screen issues: Normal, script refreshes each cycle
+- Missing data: Check telemetry sensor configuration
+- Overlapping text: Normal for long model names (truncated)
+
+### Performance Tips
+
+- **First Run**: Initial statistics scan may take 2-5 minutes
+- **Large Log History**: System limits display to 24 months
+- **Memory Management**: Script includes automatic memory cleanup
+- **Scanning**: Log scanning runs in background, doesn't block operation
+
+---
+
+## Technical Specifications
+
+### Constants
+
+- **Maximum Log Entries**: 99 per date
+- **Minimum Flight Time**: 30 seconds
+- **Scan Range**: 365 days
+- **Maximum Display Months**: 24
+- **Date Cache Size**: 50 entries
+- **Timer Cache Size**: 60 entries
+
+### Telemetry Items
+
+| Index | Name | Description | Unit |
+|-------|------|-------------|------|
+| 1 | Vbat | Battery Voltage | V |
+| 2 | Curr | Current | A |
+| 3 | Hspd | Head Speed | RPM |
+| 4 | Capa | Capacity | mAh |
+| 5 | Bat% | Battery Percentage | % |
+| 6 | Tesc | ESC Temperature | °C |
+| 7 | Thr | Throttle | % |
+| 8 | 1RSS | RSSI | dB |
+| 9 | Vbec | BEC Voltage | V |
+| 10 | GOV | Governor State | - |
+
+### Governor States
+
+0. OFF
+1. IDLE
+2. SPOOLUP
+3. RECOVERY
+4. ACTIVE
+5. THR-OFF
+6. LOST-HS
+7. AUTOROT
+8. BAILOUT
+
+### Flight Data Array
+
+| Index | Field | Description |
+|-------|-------|-------------|
+| 1 | Date | YYYYMMDD format |
+| 2 | Model | Model name |
+| 3 | Time | Flight duration (MM:SS) |
+| 4 | Flight# | Today's flight number |
+| 5 | Capacity | Battery capacity used (mAh) |
+| 6 | MinVoltage | Minimum battery voltage (V) |
+| 7 | MaxCurrent | Maximum current (A) |
+| 8 | MaxPower | Maximum power (W) |
+| 9 | MaxRPM | Maximum head speed (RPM) |
+| 10 | MinBEC | Minimum BEC voltage (V) |
+| 11 | Total | Total flights for model |
+
+### Batch Processing
+
+- **Stats Scan Batch Size**: 3 files per cycle (Phase 1)
+- **Stats Scan Batch Size**: 2 files per cycle (Phase 2)
+- **Log Scan Batch Size**: 5 files per cycle
+
+---
+
+## Additional Notes
+
+### Best Practices
+
+1. **Regular Backups**: Periodically backup `/LOGS/` directory
+2. **SD Card Maintenance**: Ensure SD card has adequate free space
+3. **Model Naming**: Use consistent model names for accurate statistics
+4. **Telemetry Setup**: Verify all sensors before first flight
+5. **Flight Review**: Regularly review logs to monitor model performance
+
+### Limitations
+
+- Maximum 99 log entries displayed per date
+- Statistics scan limited to 365 days
+- Display limited to 24 months of history
+- Model names longer than 7 characters are truncated in detail view
+- Requires Channel 5 for arming detection
+
+### Future Enhancements
+
+- Export logs to external format
+- Graphical flight data visualization
+- Customizable telemetry display layout
+- Additional statistics and analytics
+
+---
+
+## Support and Updates
+
+For issues, questions, or feature requests, please refer to the project documentation or contact the development team.
+
+**Version History:**
+- v2.1: Current version with enhanced statistics and date selection
+
+---
+
+## License and Disclaimer
+
+This software is provided as-is for use with compatible OpenTX/EdgeTX transmitters. Users are responsible for ensuring proper operation and data backup. The developers are not responsible for any data loss or equipment damage resulting from the use of this software.
+
+---
+
+**End of Manual**
+
 # Rotorflight Dashboard V2.1 中文说明书
 
 ## 脚本简介
@@ -451,6 +955,7 @@ Rotorflight Dashboard V2.1 是一款专为ELRS遥控器设计的 Lua 脚本，�
 ---
 
 **祝您飞行愉快！**
+
 
 
 
