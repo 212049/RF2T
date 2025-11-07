@@ -43,13 +43,11 @@
 
 **如果您之前使用过旧版本脚本，有以下情况：**
 - 所有机型的日志混在一个文件里
-- `/LOGS/` 文件夹下直接有 `RFLog_20250115.csv` 这样的文件
-- 想要按机型分开管理日志
+- `/LOGS/` 文件夹下直接有格式为 `RFLog_20250115.csv` 这样的文件
 
 **If you used old version script and have:**
 - Multiple models mixed in same log files
 - Files like `RFLog_20250115.csv` directly in `/LOGS/` folder
-- Want to separate logs by model
 
 ### 如何使用？/ How to use?
 
@@ -434,6 +432,7 @@ local teleItemName = {
 ---
 
 *说明书版本：2.1 | 最后更新：2025-01*
+
 
 
 
